@@ -3,10 +3,13 @@
     height: 100vh;
     position: relative;
     overflow: hidden;
+    background-color: #f3f3f3;
+    padding: 0;
 }
 
 .main img{
-    width: 30vw;
+    width: 20vw;
+    height: 45vh;
     position: absolute;
     display: none;
     transform: translateX(-50%) translateY(-50%);;
