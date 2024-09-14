@@ -9,12 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "autoprefixer": "^10.4.20",
     "framer-motion": "^11.5.4",
     "gsap": "^3.12.5",
+    "keep-react": "^1.5.0",
     "locomotive-scroll": "^5.0.0-beta.21",
     "next": "13.4.2",
+    "phosphor-react": "^1.4.1",
+    "postcss": "^8.4.45",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "sass": "^1.78.0"
+    "sass": "^1.78.0",
+    "tailwindcss": "^3.4.11"
   }
 }

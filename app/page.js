@@ -1,70 +1,66 @@
-'use client'
-import styles from './page.module.css'
-import {useRef, useEffect, useState} from 'react';
-import { AnimatePresence } from 'framer-motion';
+'use client';
+import styles from './page.module.scss'
+import Image from 'next/image';
+import {useEffect, useRef, useState} from 'react';
+import gsap from 'gsap';
+import {
+  floating1,
+  floating2,
+  floating3,
+  floating4,
+  floating5,
+  floating6,
+  floating7,
+  floating8
+} from './components/floatingImage/data'
+import {AnimatePresence} from "framer-motion";
 import Preloader from "./Preloader/index"
+import {OurTimeline} from "@/app/components/OurTimeline";
 
-export default function Index() {
-  const steps = useRef(0);
-  const currentIndex = useRef(0);
-  const nbOfImages = useRef(0);
-  const maxNumberOfImages = 8;
-  const refs = useRef([]);
-  const [isLoading, setIsLoading] = useState(true);
+export default function Home() {
+
+  const plane1 = useRef(null);
+  const plane2 = useRef(null);
+  const plane3 = useRef(null);
+  let requestAnimationFrameId = null;
+  let xForce = 0;
+  let yForce = 0;
+  const easing = 0.08;
+  const speed = 0.01;
 
   const manageMouseMove = (e) => {
-    const { clientX, clientY, movementX, movementY } = e;
+    const { movementX, movementY } = e
+    xForce += movementX * speed;
+    yForce += movementY * speed;
 
-    steps.current += Math.abs(movementX) + Math.abs(movementY);
-
-    if (steps.current >= currentIndex.current * 150) {
-      moveImage(clientX, clientY);
-
-      if (nbOfImages.current === maxNumberOfImages) {
-        removeImage();
-      }
-    }
-
-    if (currentIndex.current === refs.current.length) {
-      currentIndex.current = 0;
-      steps.current = -150;
+    if(requestAnimationFrameId == null){
+      requestAnimationFrameId = requestAnimationFrame(animate);
     }
   }
 
-  const moveImage = (x, y) => {
-    const currentImage = refs.current[currentIndex.current].current;
-    currentImage.style.left = x + "px";
-    currentImage.style.top = y + "px";
-    currentImage.style.display = "block";
-    currentIndex.current++;
-    nbOfImages.current++;
-    setZIndex();
-  }
+  const lerp = (start, target, amount) => start * (1 - amount) +target * amount;
 
-  const setZIndex = () => {
-    const images = getCurrentImages();
-    for (let i = 0; i < images.length; i++) {
-      images[i].style.zIndex = i;
+  const animate = () => {
+    xForce = lerp(xForce, 0, easing);
+    yForce = lerp(yForce, 0, easing);
+    gsap.set(plane1.current, {x: `+=${xForce}`, y: `+=${yForce}`})
+    gsap.set(plane2.current, {x: `+=${xForce * 0.5}`, y: `+=${yForce * 0.5}`})
+    gsap.set(plane3.current, {x: `+=${xForce * 0.25}`, y: `+=${yForce * 0.25}`})
+
+    if(Math.abs(xForce) < 0.01) xForce = 0;
+    if(Math.abs(yForce) < 0.01) yForce = 0;
+
+    if(xForce !== 0 || yForce !== 0){
+      requestAnimationFrame(animate);
+    }
+    else{
+      cancelAnimationFrame(requestAnimationFrameId)
+      requestAnimationFrameId = null;
     }
   }
 
-  const removeImage = () => {
-    const images = getCurrentImages();
-    images[0].style.display = "none";
-    nbOfImages.current--;
-  }
 
-  const getCurrentImages = () => {
-    let images = [];
-    let indexOfFirst = currentIndex.current - nbOfImages.current;
-    for (let i = indexOfFirst; i < currentIndex.current; i++) {
-      let targetIndex = i;
-      if (targetIndex < 0) targetIndex += refs.current.length;
-      images.push(refs.current[targetIndex].current);
-    }
-    return images;
-  }
-
+  const [isLoading, setIsLoading] = useState(true);
   useEffect( () => {
     (
         async () => {
@@ -81,22 +77,68 @@ export default function Index() {
   }, [])
 
   return (
-      <div onMouseMove={manageMouseMove} className={styles.main}>
-        <AnimatePresence mode={'wait'}>
-          {isLoading && <Preloader />}
-        </AnimatePresence>
-        {
-          [...Array(16).keys()].map((_, index) => {
-            const ref = useRef(null);
-            // Push ref only during the initial mount
-            useEffect(() => {
-              refs.current[index] = ref;
-            }, []);
-
-            return <img key={index} ref={ref} src={`/images/${index}.png`} alt="image!" style={{ position: "absolute", display: "none" }} />;
-          })
-        }
-
+      <div>
+        <main onMouseMove={(e) => {
+          manageMouseMove(e)
+        }} className={styles.main}>
+          <AnimatePresence mode={"wait"}>
+            {isLoading && <Preloader/>}
+          </AnimatePresence>
+          <div ref={plane1} className={styles.plane}>
+            <Image
+                src={floating1}
+                alt='image'
+                width={300}
+            />
+            <Image
+                src={floating2}
+                alt='image'
+                width={300}
+            />
+            <Image
+                src={floating7}
+                alt='image'
+                width={225}
+            />
+          </div>
+          <div ref={plane2} className={styles.plane}>
+            <Image
+                src={floating4}
+                alt='image'
+                width={250}
+            />
+            <Image
+                src={floating6}
+                alt='image'
+                width={200}
+            />
+            <Image
+                src={floating8}
+                alt='image'
+                width={225}
+            />
+          </div>
+          <div ref={plane3} className={styles.plane}>
+            <Image
+                src={floating3}
+                alt='image'
+                width={150}
+            />
+            <Image
+                src={floating5}
+                alt='image'
+                width={200}
+            />
+          </div>
+          <div className={styles.title}>
+            <p>Happy One Year, Dani Soriano ❤️</p>
+            <img src={"/milkandmocha.gif"} alt={"bruh"} className={"w-16 h-16 flex justify-center m-auto"}/>
+          </div>
+        </main>
+        <div className={"m-auto flex justify-center mt-32"}>
+          <OurTimeline/>
+        </div>
       </div>
+
   )
 }
